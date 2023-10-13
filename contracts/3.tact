@@ -60,7 +60,7 @@ contract Task3 with Deployable {
       if(p > self.b){
         send(SendParameters{
           to: self.jAddressA,
-          value: 0, 
+          value: 60000000, 
           mode: SendPayGasSeparately, 
           body: TokenTransfer{
             queryId: msg.queryId,
@@ -74,7 +74,7 @@ contract Task3 with Deployable {
       else {
         send(SendParameters{
           to: self.jAddressB,
-          value: 0, 
+          value: 60000000, 
           mode: SendPayGasSeparately, 
           body: TokenTransfer{
             queryId: msg.queryId,
@@ -95,7 +95,7 @@ contract Task3 with Deployable {
       if(p > self.a){
         send(SendParameters{
           to: self.jAddressB,
-          value: 0, 
+          value: 60000000, 
           mode: SendPayGasSeparately, 
           body: TokenTransfer{
             queryId: msg.queryId,
@@ -109,7 +109,7 @@ contract Task3 with Deployable {
       else {
         send(SendParameters{
           to: self.jAddressA,
-          value: 0, 
+          value: 60000000, 
           mode: SendPayGasSeparately, 
           body: TokenTransfer{
             queryId: msg.queryId,
