@@ -1,15 +1,17 @@
-import { Blockchain, SandboxContract } from '@ton-community/sandbox';
-import { toNano } from 'ton-core';
+import { Blockchain, SandboxContract, TreasuryContract } from '@ton-community/sandbox';
+import { beginCell, toNano, Address, Cell } from 'ton-core';
 import { Task2 } from '../wrappers/Task2';
+import '@ton-community/test-utils';
 
 describe('Task2', () => {
     let blockchain: Blockchain;
     let task2: SandboxContract<Task2>;
+    let deployer: SandboxContract<TreasuryContract>;
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-        task2 = blockchain.openContract(await Task2.fromInit());
-        const deployer = await blockchain.treasury('deployer');
+        deployer = await blockchain.treasury('deployer');
+        task2 = blockchain.openContract(await Task2.fromInit(deployer.address));
         const deployResult = await task2.send(
             deployer.getSender(),
             {
@@ -28,7 +30,55 @@ describe('Task2', () => {
         });
     });
 
-    it('test', async () => {
+    it('Message', async () => {
+        const sender = await blockchain.treasury("Sender");
+        const message = beginCell().storeStringTail("Hello uwu").endCell();
+        const messageResult = await task2.send(
+            sender.getSender(),
+            {
+                value: toNano("0.05")
+            },
+            message.asSlice(),
+        );
+        
+        // console.log(sender.address, task2.address, deployer.address);
+        // console.log(messageResult.transactions.map((e) => [e.inMessage?.info, e.inMessage?.body]));
+
+        expect(messageResult.transactions).toHaveLength(3);
+        let adminIn = messageResult.transactions[2].inMessage?.body;
+        if(adminIn === undefined) {
+            expect(false).toBeTruthy();
+            return;
+        }
+        let inMsg = adminIn.beginParse().skip(32).asCell(); // skip op code
+        expect(inMsg).toEqualCell(beginCell().storeAddress(sender.address).storeRef(message).endCell());
     });
+
+    it("Bounce", async () => {
+        const sender = await blockchain.treasury("Sender");
+        const message = beginCell().storeStringTail("Hello uwu").endCell();
+        const messageResult = await task2.send(
+            deployer.getSender(),
+            {
+                value: toNano("0.05")
+            },
+            {
+                $$type: "Bounced",
+                queryId: 1n,
+                sender: sender.address,
+            }
+        );
+        
+        // console.log(sender.address, task2.address, deployer.address);
+        // console.log(messageResult.transactions.map((e) => [e.inMessage?.info, e.inMessage?.body]));
+
+        expect(messageResult.transactions).toHaveLength(3);
+        expect(messageResult.transactions).toHaveTransaction({
+            from: task2.address,
+            to: sender.address,
+            success: true
+        })
+    });
+
 });
 

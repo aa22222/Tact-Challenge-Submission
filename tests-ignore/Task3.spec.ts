@@ -1,16 +1,17 @@
 import { Blockchain, SandboxContract } from '@ton-community/sandbox';
 import { toNano } from 'ton-core';
-import { Task1 } from '../wrappers/Task1';
+import { Task3 } from '../wrappers/Task3';
 
-describe('Task1', () => {
+describe('Task3', () => {
     let blockchain: Blockchain;
-    let task1: SandboxContract<Task1>;
+    let task3: SandboxContract<Task3>;
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-        task1 = blockchain.openContract(await Task1.fromInit());
+        task3 = blockchain.openContract(await Task3.fromInit());
         const deployer = await blockchain.treasury('deployer');
-        const deployResult = await task1.send(
+        
+        const deployResult = await task3.send(
             deployer.getSender(),
             {
                 value: toNano('0.05'),
@@ -22,7 +23,7 @@ describe('Task1', () => {
         );
         expect(deployResult.transactions).toHaveTransaction({
             from: deployer.address,
-            to: task1.address,
+            to: task3.address,
             deploy: true,
             success: true,
         });
@@ -31,3 +32,5 @@ describe('Task1', () => {
     it('test', async () => {
     });
 });
+
+

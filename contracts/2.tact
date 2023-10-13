@@ -16,6 +16,11 @@ message(0x44) Bounced {
   sender: Address;
 }
 
+message Out {
+  sender: Address;
+  msg: Cell;
+}
+
 contract Task2 with Deployable {
   admin: Address;
 
@@ -24,9 +29,22 @@ contract Task2 with Deployable {
   }
   
   receive(msg: Bounced) {
+    send(SendParameters{
+      to: msg.sender,
+      value: 0, 
+      mode: SendRemainingValue, 
+      bounce: true
+    });
   }
 
   receive(msg: Slice) {
+    send(SendParameters{
+      to: self.admin,
+      value: 0, 
+      mode: SendRemainingValue, 
+      bounce: false,
+      body: Out{sender: sender(), msg: msg.asCell()}.toCell()
+    });
   }
 }
 
