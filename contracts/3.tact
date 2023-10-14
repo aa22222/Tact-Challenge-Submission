@@ -56,34 +56,38 @@ contract Task3 with Deployable {
         self.a = self.a + msg.amount;
         return;
       }
-      let p : Int = msg.amount * self.price(self.jAddressB);
-      if(p > self.b){
+      let p : Int = msg.amount * self.b / self.a;
+      if(p > self.b || p == 0){
         send(SendParameters{
           to: self.jAddressA,
-          value: 60000000, 
-          mode: SendPayGasSeparately, 
+          value: 0,
+          mode: SendRemainingValue,
           body: TokenTransfer{
             queryId: msg.queryId,
             amount: msg.amount,
             destination: msg.from,
+            responseDestination: msg.from,
             forwardTonAmount: 50000000,
-            forwardPayload: "Bounce".asComment().asSlice()
+            forwardPayload: emptyCell().asSlice()
           }.toCell()
         });
       }
       else {
         send(SendParameters{
           to: self.jAddressB,
-          value: 60000000, 
-          mode: SendPayGasSeparately, 
+          value: 0,
+          mode: SendRemainingValue,
           body: TokenTransfer{
             queryId: msg.queryId,
             amount: p,
             destination: msg.from,
+            responseDestination: msg.from,
             forwardTonAmount: 50000000,
-            forwardPayload: "Success".asComment().asSlice()
+            forwardPayload: emptyCell().asSlice()
           }.toCell()
         });
+        self.a = self.a + msg.amount;
+        self.b = self.b - p;
       }
     }
     if(sender() == self.jAddressB){
@@ -91,34 +95,38 @@ contract Task3 with Deployable {
         self.b = self.b + msg.amount;
         return;
       }
-      let p : Int = msg.amount * self.price(self.jAddressA);
-      if(p > self.a){
+      let p : Int = msg.amount * self.a / self.b;
+      if(p > self.a || p == 0){
         send(SendParameters{
           to: self.jAddressB,
-          value: 60000000, 
-          mode: SendPayGasSeparately, 
+          value: 0,
+          mode: SendRemainingValue,
           body: TokenTransfer{
             queryId: msg.queryId,
             amount: msg.amount,
             destination: msg.from,
+            responseDestination: msg.from,
             forwardTonAmount: 50000000,
-            forwardPayload: "Bounce".asComment().asSlice()
+            forwardPayload: emptyCell().asSlice()
           }.toCell()
         });
       }
       else {
         send(SendParameters{
           to: self.jAddressA,
-          value: 60000000, 
-          mode: SendPayGasSeparately, 
+          value: 0,
+          mode: SendRemainingValue,
           body: TokenTransfer{
             queryId: msg.queryId,
             amount: p,
             destination: msg.from,
+            responseDestination: msg.from,
             forwardTonAmount: 50000000,
-            forwardPayload: "Success".asComment().asSlice()
+            forwardPayload: emptyCell().asSlice()
           }.toCell()
         });
+        self.b = self.b + msg.amount;
+        self.a = self.a - p;
       }
     }
     
@@ -131,7 +139,7 @@ contract Task3 with Deployable {
     if(token == self.jAddressB){
       return self.decimal * self.b / self.a;
     }
-    return -1;
+    return 0;
   }
   
   get fun balance(token: Address): Int { 
@@ -141,6 +149,6 @@ contract Task3 with Deployable {
     if(token == self.jAddressB){
       return self.b;
     }
-    return -1;
+    return 0;
   }
 }
