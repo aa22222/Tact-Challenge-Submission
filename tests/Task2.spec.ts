@@ -10,7 +10,7 @@ describe('Task2', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-        deployer = await blockchain.treasury('deployer');
+        deployer = await blockchain.treasury('deployer', {balance: 100000000000n});
         task2 = blockchain.openContract(await Task2.fromInit(deployer.address));
         const deployResult = await task2.send(
             deployer.getSender(),
@@ -60,17 +60,17 @@ describe('Task2', () => {
         const messageResult = await task2.send(
             deployer.getSender(),
             {
-                value: toNano("0.05")
+                value: toNano("5")
             },
             {
                 $$type: "Bounced",
-                queryId: 1n,
+                queryId: 34567897675865n,
                 sender: sender.address,
             }
         );
         
         // console.log(sender.address, task2.address, deployer.address);
-        // console.log(messageResult.transactions.map((e) => [e.inMessage?.info, e.inMessage?.body]));
+        console.log(messageResult.transactions.map((e) => [e.inMessage?.info, e.inMessage?.body]));
 
         expect(messageResult.transactions).toHaveLength(3);
         expect(messageResult.transactions).toHaveTransaction({
