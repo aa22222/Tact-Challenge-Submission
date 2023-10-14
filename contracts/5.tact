@@ -59,32 +59,113 @@ message(0x5fcc3d14) Transfer {
     queryId: Int as uint64;            
     newOwner: Address; 
     responseDestination: Address; 
-    customPayload: Cell?; 
+    customPayload: Cell? = null; 
     forwardAmount: Int as coins; 
     forwardPayload: Slice as remaining; 
+}
+
+inline fun sendNft(nft: Address, dest: Address, queryId: Int) {
+  send(SendParameters{
+    to: nft,
+    value: 80000000,
+    body: Transfer{
+      queryId: queryId,
+      newOwner: dest,
+      responseDestination: dest,
+      forwardAmount: 0,
+      forwardPayload: emptyCell().asSlice()
+    }.toCell()
+  });
+}
+
+inline fun returnNft(msg: OwnershipAssigned) {
+  send(SendParameters{
+    to: sender(),
+    value: 0,
+    mode: SendRemainingValue,
+    body: Transfer{
+      queryId: msg.queryId,
+      newOwner: msg.prevOwner,
+      responseDestination: msg.prevOwner,
+      forwardAmount: 0,
+      forwardPayload: emptyCell().asSlice()
+    }.toCell()
+  });
 }
 
 contract Task5 with Deployable {
   seed: Int as uint128;
   admin: Address;
+  nftlist: map<Int as uint16, Address>;
+  nftsHeld: Int as uint16;
   
   init(seed: Int, owner: Address) {
     self.admin = owner;
     self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
+    self.nftsHeld = 0;
   }
 
   receive(msg: OwnershipAssigned) {
+    if(msg.prevOwner == self.admin){
+      self.nftlist.set(self.nftsHeld, sender());
+      self.nftsHeld = self.nftsHeld + 1;
+      return;
+    }
+    if(context().value < 2100000000){
+      returnNft(msg);
+      return;
+    }
+    // Send nft;
+    let index: Int = random(0, self.nftsHeld - 1);
+    let nft: Address = self.nftlist.get(index)!!;
+    self.nftlist.set(index, sender());
+
+    nativeReserve(2000000000, 0);
+    send(SendParameters{
+      to: nft,
+      value: 0,
+      mode: SendRemainingValue,
+      body: Transfer{
+        queryId: msg.queryId,
+        newOwner: msg.prevOwner,
+        responseDestination: msg.prevOwner,
+        forwardAmount: 0,
+        forwardPayload: emptyCell().asSlice()
+      }.toCell()
+    });
   }
 
   receive(msg: AdminWithdrawalProfit) {
+    require(sender() == self.admin, "Insufficient privelegies");
+    nativeReserve(100000000, 0);
+    send(SendParameters{
+      to: sender(),
+      value: 0,
+      mode: SendRemainingBalance,
+      body: AdminFetchProfit{
+       queryId: msg.queryId
+      }.toCell()
+    });
   }
 
   receive(msg: AdminWithdrawalAllNFTs) {
+    require(context().value >= (1000000000 + self.nftsHeld * 80000000) , "Insufficent funds");
+    require(sender() == self.admin, "Invalid sender");
+    while(self.nftsHeld > 0){
+      let next: Int = self.nftsHeld - 1;
+      let nft: Address = self.nftlist.get(next)!!;
+      self.nftlist.set(next, null);
+      self.nftsHeld = next;
+
+      sendNft(nft, self.admin, msg.queryId);
+    }
   }
 
   get fun profit(): Int { 
+    return myBalance() - 100000000;
   }
   
   get fun nfts(): map<Int as uint16, Address> { 
+    return self.nftlist;
   }
 }

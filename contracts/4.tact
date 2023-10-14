@@ -80,7 +80,6 @@ contract Task4 with Deployable {
     self.owner = msg.prevOwner;
     self.nft = sender();
     self.unlockTime = now() + time;
-    self.reply("Locked NFT".asComment());
   }
 
   receive(msg: NftWithdrawal) {
@@ -99,7 +98,6 @@ contract Task4 with Deployable {
         queryId: msg.queryId,
         newOwner: sender(),
         responseDestination: sender(),
-        customPayload: null,
         forwardAmount: 0,
         forwardPayload: emptyCell().asSlice()
       }.toCell()
