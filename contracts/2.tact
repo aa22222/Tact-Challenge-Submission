@@ -24,6 +24,7 @@ contract Task2 with Deployable {
   }
   
   receive(msg: Bounced) {
+    nativeThrowUnless(10, sender() == self.admin);
     send(SendParameters{
       to: msg.sender,
       value: 0, 
