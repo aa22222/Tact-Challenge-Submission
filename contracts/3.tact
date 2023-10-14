@@ -50,6 +50,22 @@ contract Task3 with Deployable {
     self.b = 0;
   }
 
+  inline fun sendToken(amount: Int, token: Address, dest: Address, queryId: Int) {
+    send(SendParameters{
+      to: token,
+      value: 0,
+      mode: SendRemainingValue,
+      body: TokenTransfer{
+        queryId: queryId,
+        amount: amount,
+        destination: dest,
+        responseDestination: dest,
+        forwardTonAmount: 0,
+        forwardPayload: emptyCell().asSlice()
+      }.toCell()
+    });
+  }
+
   receive(msg: TokenNotification) {
     if(sender() == self.jAddressA){
       if(msg.from == self.owner){
@@ -57,35 +73,11 @@ contract Task3 with Deployable {
         return;
       }
       let p : Int = msg.amount * self.b / self.a;
-      if(p > self.b || p == 0){
-        send(SendParameters{
-          to: self.jAddressA,
-          value: 0,
-          mode: SendRemainingValue,
-          body: TokenTransfer{
-            queryId: msg.queryId,
-            amount: msg.amount,
-            destination: msg.from,
-            responseDestination: msg.from,
-            forwardTonAmount: 50000000,
-            forwardPayload: emptyCell().asSlice()
-          }.toCell()
-        });
+      if(p > self.b){
+        self.sendToken(msg.amount, self.jAddressA, msg.from, msg.queryId);
       }
       else {
-        send(SendParameters{
-          to: self.jAddressB,
-          value: 0,
-          mode: SendRemainingValue,
-          body: TokenTransfer{
-            queryId: msg.queryId,
-            amount: p,
-            destination: msg.from,
-            responseDestination: msg.from,
-            forwardTonAmount: 50000000,
-            forwardPayload: emptyCell().asSlice()
-          }.toCell()
-        });
+        self.sendToken(p, self.jAddressB, msg.from, msg.queryId);
         self.a = self.a + msg.amount;
         self.b = self.b - p;
       }
@@ -96,40 +88,15 @@ contract Task3 with Deployable {
         return;
       }
       let p : Int = msg.amount * self.a / self.b;
-      if(p > self.a || p == 0){
-        send(SendParameters{
-          to: self.jAddressB,
-          value: 0,
-          mode: SendRemainingValue,
-          body: TokenTransfer{
-            queryId: msg.queryId,
-            amount: msg.amount,
-            destination: msg.from,
-            responseDestination: msg.from,
-            forwardTonAmount: 50000000,
-            forwardPayload: emptyCell().asSlice()
-          }.toCell()
-        });
+      if(p > self.a){
+        self.sendToken(msg.amount, self.jAddressB, msg.from, msg.queryId);
       }
       else {
-        send(SendParameters{
-          to: self.jAddressA,
-          value: 0,
-          mode: SendRemainingValue,
-          body: TokenTransfer{
-            queryId: msg.queryId,
-            amount: p,
-            destination: msg.from,
-            responseDestination: msg.from,
-            forwardTonAmount: 50000000,
-            forwardPayload: emptyCell().asSlice()
-          }.toCell()
-        });
+        self.sendToken(p, self.jAddressA, msg.from, msg.queryId);
         self.b = self.b + msg.amount;
         self.a = self.a - p;
       }
     }
-    
   } 
   
   get fun price(token: Address): Int { 
