@@ -24,12 +24,12 @@ contract Task2 with Deployable {
   }
   
   receive(msg: Bounced) {
-    send(SendParameters{
-      to: msg.sender,
-      value: 0, 
-      mode: SendRemainingValue,
-      bounce: true
-    });
+    // send(SendParameters{
+    //   to: msg.sender,
+    //   value: 0, 
+    //   mode: SendRemainingValue,
+    //   bounce: true
+    // });
   }
 
   receive(msg: Slice) {
