@@ -50,7 +50,7 @@ describe('Task2', () => {
             expect(false).toBeTruthy();
             return;
         }
-        let inMsg = adminIn.beginParse().skip(32).asCell(); // skip op code
+        let inMsg = adminIn; // skip op code
         expect(inMsg).toEqualCell(beginCell().storeAddress(sender.address).storeRef(message).endCell());
     });
 

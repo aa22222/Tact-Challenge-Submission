@@ -16,11 +16,6 @@ message(0x44) Bounced {
   sender: Address;
 }
 
-message Out {
-  sender: Address;
-  msg: Cell;
-}
-
 contract Task2 with Deployable {
   admin: Address;
 
@@ -41,7 +36,7 @@ contract Task2 with Deployable {
       to: self.admin,
       value: 0, 
       mode: SendRemainingValue, 
-      body: Out{sender: sender(), msg: msg.asCell()}.toCell()
+      body: beginCell().storeAddress(sender()).storeRef(msg.asCell()).endCell()
     });
   }
 }
