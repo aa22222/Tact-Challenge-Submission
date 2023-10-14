@@ -1,13 +1,19 @@
-import { Blockchain, SandboxContract } from '@ton-community/sandbox';
+import { Blockchain, SandboxContract, TreasuryContract, } from '@ton-community/sandbox';
 import { toNano } from 'ton-core';
+import { JettonMaster } from 'ton';
 import { Task3 } from '../wrappers/Task3';
 
 describe('Task3', () => {
     let blockchain: Blockchain;
     let task3: SandboxContract<Task3>;
+    let user: SandboxContract<TreasuryContract>;
+    let jettonA, jettonB: SandboxContract<JettonMaster>;
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
+        
+        
+        
         task3 = blockchain.openContract(await Task3.fromInit());
         const deployer = await blockchain.treasury('deployer');
         
