@@ -122,7 +122,7 @@ contract Task5 with Deployable {
       return;
     }
     // Send nft;
-    nativeReserve(2000000000, 0);
+    // nativeReserve(2000000000, 0);
     
     let index: Int = random(0, self.nftsHeld);
     if(index == self.nftsHeld){
