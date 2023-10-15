@@ -10,7 +10,7 @@ describe('Task5', () => {
     let blockchain: Blockchain;
     let task5: SandboxContract<Task5>;
     let nftCollection: SandboxContract<any>;
-    let deployer: SandboxContract<TreasuryContract>
+    let deployer: SandboxContract<TreasuryContract>;
 
     async function transferNft(nft: SandboxContract<NftItem>, from: SandboxContract<TreasuryContract>, to: SandboxContract<any>, value: bigint ) : Promise<SendMessageResult> {
         return await nft.send(

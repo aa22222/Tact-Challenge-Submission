@@ -46,6 +46,21 @@ message NftWithdrawal {
   nftAddress: Address;
 }
 
+inline fun returnNft(msg: OwnershipAssigned) {
+  send(SendParameters{
+    to: sender(),
+    value: 0,
+    mode: SendRemainingValue,
+    body: Transfer{
+      queryId: msg.queryId,
+      newOwner: msg.prevOwner,
+      responseDestination: msg.prevOwner,
+      forwardAmount: 0,
+      forwardPayload: emptyCell().asSlice()
+    }.toCell()
+  });
+}
+
 contract Task4 with Deployable {
   seed: Int as uint128;
   unlockTime: Int;
@@ -60,18 +75,7 @@ contract Task4 with Deployable {
   receive(msg: OwnershipAssigned) {
     // An nft is already locked
     if(self.nft != null){
-      send(SendParameters{
-        to: sender(),
-        value: 0,
-        mode: SendRemainingValue,
-        body: Transfer{
-          queryId: msg.queryId,          
-          newOwner: msg.prevOwner, 
-          responseDestination: msg.prevOwner, 
-          forwardAmount: 0,
-          forwardPayload: emptyCell().asSlice() 
-        }.toCell()
-      });
+      returnNft(msg);
       return;
     }
 
@@ -88,16 +92,15 @@ contract Task4 with Deployable {
       self.reply("NFT is still locked".asComment());
       return;
     }
-    nativeThrowUnless(1, self.nft == msg.nftAddress);
 
     send(SendParameters{
-      to: msg.nftAddress,
+      to: self.nft!!,
       value: 0,
       mode: SendRemainingValue,
       body: Transfer{
         queryId: msg.queryId,
-        newOwner: sender(),
-        responseDestination: sender(),
+        newOwner: self.owner!!,
+        responseDestination: self.owner!!,
         forwardAmount: 0,
         forwardPayload: emptyCell().asSlice()
       }.toCell()
@@ -107,7 +110,7 @@ contract Task4 with Deployable {
   }
 
   get fun time(): Int {
-    return now() - self.unlockTime;
+    return max(self.unlockTime - now(), 0);
   }
 
   get fun nft(): Address? {
