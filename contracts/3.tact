@@ -59,7 +59,7 @@ inline fun sendJetton(jetton: Address, to: Address, amount: Int, queryId: Int){
       amount: amount,
       destination: to,
       responseDestination: to,
-      forwardTonAmount: 0,
+      forwardTonAmount: 50000000,
       forwardPayload: emptyCell().asSlice()
     }.toCell()
   });
@@ -83,7 +83,7 @@ contract Task3 with Deployable {
   }
 
   receive(msg: TokenNotification) {
-    // nativeThrowUnless(10, sender() == self.jettonAddressA || sender() == self.jettonAddressB);
+    nativeThrowUnless(10, sender() == self.jettonAddressA || sender() == self.jettonAddressB);
 
     if(msg.from == self.owner){
       if(sender() == self.jettonAddressA) {
