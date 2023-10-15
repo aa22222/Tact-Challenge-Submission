@@ -43,91 +43,93 @@ message(0xf8a7ea5) TokenTransfer {
     queryId: Int as uint64;
     amount: Int as coins;
     destination: Address;
-    responseDestination: Address? = null;
+    responseDestination: Address?;
     customPayload: Cell? = null;
     forwardTonAmount: Int as coins;
     forwardPayload: Slice as remaining;
 }
 
-const decimal: Int = 1000000000;
+inline fun sendJetton(jetton: Address, to: Address, amount: Int, queryId: Int){
+  send(SendParameters{
+    to: jetton,
+    value: 0,
+    mode: SendRemainingValue,
+    body: TokenTransfer{
+      queryId: queryId,
+      amount: amount,
+      destination: to,
+      responseDestination: to,
+      forwardTonAmount: 0,
+      forwardPayload: emptyCell().asSlice()
+    }.toCell()
+  });
+}
 
 contract Task3 with Deployable {
   owner: Address;
-  a: Int;
-  b: Int;
-  jAddressA: Address;
-  jAddressB: Address;
+  aAmount: Int;
+  bAmount: Int;
+  jettonAddressA: Address;
+  jettonAddressB: Address;
+  decimal: Int;
 
-  init(admin: Address, newJAddressA: Address, newJAddressB: Address) {
+  init(admin: Address, newJettonAddressA: Address, newJettonAddressB: Address) {
     self.owner = admin;
-    self.jAddressA = newJAddressA;
-    self.jAddressB = newJAddressB;
-    self.a = 0;
-    self.b = 0;
-  }
-
-  inline fun sendToken(amount: Int, token: Address, dest: Address, queryId: Int) {
-    send(SendParameters{
-      to: token,
-      value: 0,
-      mode: SendRemainingValue,
-      body: TokenTransfer{
-        queryId: queryId,
-        amount: amount,
-        destination: dest,
-        responseDestination: dest,
-        forwardTonAmount: 0,
-        forwardPayload: emptyCell().asSlice()
-      }.toCell()
-    });
+    self.jettonAddressA = newJettonAddressA;
+    self.jettonAddressB = newJettonAddressB;
+    self.aAmount = 0;
+    self.bAmount = 0;
+    self.decimal = 1000000000;
   }
 
   receive(msg: TokenNotification) {
-    nativeThrowUnless(1, sender() == self.jAddressA || sender() == self.jAddressB);
-    if(sender() == self.jAddressA){
-      if(msg.from == self.owner){
-        self.a = self.a + msg.amount;
-        return;
-      }
-      let p : Int = msg.amount * self.price(self.jAddressB) / decimal;
-      if(p > self.b){
-        self.sendToken(msg.amount, self.jAddressA, msg.from, msg.queryId);
+    nativeThrowUnless(10, sender() == self.jettonAddressA || sender() == self.jettonAddressB);
+
+    if(msg.from == self.owner){
+      if(sender() == self.jettonAddressA) {
+        self.aAmount = self.aAmount + msg.amount;
       }
       else {
-        self.sendToken(p, self.jAddressB, msg.from, msg.queryId);
-        self.a = self.a + msg.amount;
-        self.b = self.b - p;
+        self.bAmount = self.bAmount + msg.amount;
+      }
+      return;
+    }
+
+    if(sender() == self.jettonAddressA){
+      let sendB : Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+      if(sendB > self.bAmount){
+        sendJetton(self.jettonAddressA, msg.from, msg.amount, msg.queryId);
+      }
+      else {
+        sendJetton(self.jettonAddressB, msg.from, sendB, msg.queryId);
+        self.aAmount = self.aAmount + msg.amount;
+        self.bAmount = self.bAmount - sendB;
       }
     }
-    if(sender() == self.jAddressB){
-      if(msg.from == self.owner){
-        self.b = self.b + msg.amount;
-        return;
-      }
-      let p : Int = msg.amount * self.price(self.jAddressA) / decimal;
-      if(p > self.a){
-        self.sendToken(msg.amount, self.jAddressB, msg.from, msg.queryId);
+    else {
+      let sendA : Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
+      if(sendA > self.aAmount){
+        sendJetton(self.jettonAddressB, msg.from, msg.amount, msg.queryId);
       }
       else {
-        self.sendToken(p, self.jAddressA, msg.from, msg.queryId);
-        self.b = self.b + msg.amount;
-        self.a = self.a - p;
+        sendJetton(self.jettonAddressA, msg.from, sendA, msg.queryId);
+        self.bAmount = self.bAmount + msg.amount;
+        self.aAmount = self.aAmount - sendA;
       }
     }
   } 
   
-  get fun price(token: Address): Int { 
-    if(token == self.jAddressA){
-      return decimal * self.a / self.b;
+  get fun price(jetton: Address): Int { 
+    if(jetton == self.jettonAddressA){
+      return self.decimal * self.bAmount / self.aAmount;
     }
-    return decimal * self.b / self.a;
-
+    return self.decimal * self.aAmount / self.bAmount;
   }
   
-  get fun balance(token: Address): Int { 
-    if(token == self.jAddressA){
-      return self.a;
+  get fun balance(jetton: Address): Int { 
+    if(jetton == self.jettonAddressA){
+      return self.aAmount;
     }
-    return self.b;
+    return self.bAmount;
   }
 }
