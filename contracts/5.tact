@@ -106,36 +106,27 @@ contract Task5 with Deployable {
   }
   
   receive(msg: OwnershipAssigned) {
-    if(msg.prevOwner == self.admin){
+    if(msg.prevOwner == self.admin || context().value < 80000000){
       self.nftlist.set(self.nftsHeld, sender());
       self.nftsHeld = self.nftsHeld + 1;
       return;
     }
     if(context().value < 2100000000){
-      self.nftlist.set(self.nftsHeld, sender());
-      self.nftsHeld = self.nftsHeld + 1;
-      commit(); // Commit changes so NFT gets added to list if there is not enough funds to send it back (error is thrown)
-
-      self.nftsHeld = self.nftsHeld - 1;
-      self.nftlist.set(self.nftsHeld, null);
       returnNft(msg);
       return;
     }
-    // Send nft;
-    // nativeReserve(2000000000, 0);
     
     let index: Int = random(0, self.nftsHeld);
-    if(index == self.nftsHeld){
-      returnNft(msg);
-      return;
+    let nft: Address? = sender();
+    if(index < self.nftsHeld){
+      nft = self.nftlist.get(index);
+      self.nftlist.set(index, sender());
     }
-
-    let nft: Address? = self.nftlist.get(index)!!;
-    self.nftlist.set(index, sender());
+    
     send(SendParameters{
       to: nft!!,
-      value: 0,
-      mode: SendRemainingValue,
+      value: context().value - 2000000000,
+      mode: 0,
       body: Transfer{
         queryId: msg.queryId,
         newOwner: msg.prevOwner,
