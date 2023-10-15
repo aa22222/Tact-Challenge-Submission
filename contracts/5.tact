@@ -106,13 +106,19 @@ contract Task5 with Deployable {
   }
   
   receive(msg: OwnershipAssigned) {
-    if(msg.prevOwner == self.admin || context().value < 80000000){
+    if(msg.prevOwner == self.admin){
       self.nftlist.set(self.nftsHeld, sender());
       self.nftsHeld = self.nftsHeld + 1;
       return;
     }
     if(context().value < 2100000000){
+      self.nftlist.set(self.nftsHeld, sender());
+      self.nftsHeld = self.nftsHeld + 1;
+      commit();
+      
       returnNft(msg);
+      self.nftsHeld = self.nftsHeld - 1;
+      self.nftlist.set(self.nftsHeld, null);
       return;
     }
     
@@ -123,10 +129,11 @@ contract Task5 with Deployable {
       self.nftlist.set(index, sender());
     }
     
+    nativeReserve(myBalance() - context().value + 2000000000, 0);
     send(SendParameters{
       to: nft!!,
-      value: context().value - 2000000000,
-      mode: 0,
+      value: 0,
+      mode: SendRemainingBalance,
       body: Transfer{
         queryId: msg.queryId,
         newOwner: msg.prevOwner,
