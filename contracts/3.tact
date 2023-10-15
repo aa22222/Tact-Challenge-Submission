@@ -94,7 +94,9 @@ contract Task3 with Deployable {
       }
       return;
     }
-
+    if(1==1){
+      return;
+    }
     if(sender() == self.jettonAddressA){
       let sendB : Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
       if(sendB > self.bAmount){
@@ -128,8 +130,8 @@ contract Task3 with Deployable {
   
   get fun balance(jetton: Address): Int { 
     if(jetton == self.jettonAddressA){
-      return self.bAmount;
+      return self.aAmount;
     }
-    return self.aAmount;
+    return self.bAmount;
   }
 }
