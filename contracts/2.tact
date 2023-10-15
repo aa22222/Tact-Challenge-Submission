@@ -24,12 +24,11 @@ contract Task2 with Deployable {
   }
   
   receive(msg: Bounced) {
-    nativeThrowUnless(1, sender() == self.admin);
+    nativeThrowUnless(10, sender() == self.admin);
     send(SendParameters{
       to: msg.sender,
       value: 0, 
-      mode: SendRemainingValue,
-      bounce: false
+      mode: SendRemainingValue
     });
   }
 
