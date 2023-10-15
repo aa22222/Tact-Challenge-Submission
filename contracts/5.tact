@@ -104,7 +104,7 @@ contract Task5 with Deployable {
     self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
     self.nftsHeld = 0;
   }
-
+  
   receive(msg: OwnershipAssigned) {
     if(msg.prevOwner == self.admin){
       self.nftlist.set(self.nftsHeld, sender());
@@ -112,17 +112,28 @@ contract Task5 with Deployable {
       return;
     }
     if(context().value < 2100000000){
+      self.nftlist.set(self.nftsHeld, sender());
+      self.nftsHeld = self.nftsHeld + 1;
+      commit(); // Commit changes so NFT gets added to list if there is not enough funds to send it back (error is thrown)
+
+      self.nftsHeld = self.nftsHeld - 1;
+      self.nftlist.set(self.nftsHeld, null);
       returnNft(msg);
       return;
     }
     // Send nft;
-    let index: Int = random(0, self.nftsHeld - 1);
-    let nft: Address = self.nftlist.get(index)!!;
-    self.nftlist.set(index, sender());
-
     nativeReserve(2000000000, 0);
+    
+    let index: Int = random(0, self.nftsHeld);
+    if(index == self.nftsHeld){
+      returnNft(msg);
+      return;
+    }
+
+    let nft: Address? = self.nftlist.get(index)!!;
+    self.nftlist.set(index, sender());
     send(SendParameters{
-      to: nft,
+      to: nft!!,
       value: 0,
       mode: SendRemainingValue,
       body: Transfer{
