@@ -59,7 +59,7 @@ inline fun sendJetton(jetton: Address, to: Address, amount: Int, queryId: Int){
       amount: amount,
       destination: to,
       responseDestination: to,
-      forwardTonAmount: 50000000,
+      forwardTonAmount: 0,
       forwardPayload: emptyCell().asSlice()
     }.toCell()
   });
@@ -128,8 +128,8 @@ contract Task3 with Deployable {
   
   get fun balance(jetton: Address): Int { 
     if(jetton == self.jettonAddressA){
-      return self.aAmount;
+      return self.bAmount;
     }
-    return self.bAmount;
+    return self.aAmount;
   }
 }
