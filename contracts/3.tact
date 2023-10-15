@@ -94,11 +94,10 @@ contract Task3 with Deployable {
       }
       return;
     }
-    if(1==1){
-      return;
-    }
+    
     if(sender() == self.jettonAddressA){
-      let sendB : Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+      // let sendB : Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
+      let sendB : Int = self.price(self.jettonAddressB) * msg.amount / self.decimal;
       if(sendB > self.bAmount){
         sendJetton(self.jettonAddressA, msg.from, msg.amount, msg.queryId);
       }
@@ -109,7 +108,8 @@ contract Task3 with Deployable {
       }
     }
     else {
-      let sendA : Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
+      // let sendA : Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
+      let sendA : Int = self.price(self.jettonAddressA) * msg.amount / self.decimal;
       if(sendA > self.aAmount){
         sendJetton(self.jettonAddressB, msg.from, msg.amount, msg.queryId);
       }
