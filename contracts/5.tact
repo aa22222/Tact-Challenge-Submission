@@ -144,9 +144,11 @@ contract Task5 with Deployable {
 
   receive(msg: AdminWithdrawalProfit) {
     require(sender() == self.admin, "Insufficient privelegies");
+    nativeReserve(100000000, 0);
     send(SendParameters{
       to: sender(),
-      value: myBalance() - 100000000,
+      value: 0,
+      mode: SendRemainingBalance,
       body: AdminFetchProfit{
        queryId: msg.queryId
       }.toCell()
