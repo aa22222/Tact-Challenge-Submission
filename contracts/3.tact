@@ -49,18 +49,18 @@ message(0xf8a7ea5) TokenTransfer {
     forwardPayload: Slice as remaining;
 }
 
-inline fun sendJetton(jetton: Address, to: Address, amount: Int, queryId: Int){
+inline fun sendJetton(jetton: Address, to: Address, amount: Int){
   send(SendParameters{
     to: jetton,
     value: 0,
     mode: SendRemainingValue,
     body: TokenTransfer{
-      queryId: queryId,
+      queryId: 0,
       amount: amount,
       destination: to,
-      responseDestination: to,
-      forwardTonAmount: 0,
-      forwardPayload: emptyCell().asSlice()
+      responseDestination: myAddress(),
+      forwardTonAmount: ton("0.01"),
+      forwardPayload: emptySlice()
     }.toCell()
   });
 }
@@ -99,10 +99,10 @@ contract Task3 with Deployable {
       let sendB : Int = (self.bAmount * self.decimal / self.aAmount) * msg.amount / self.decimal;
       // let sendB : Int = msg.amount * self.decimal / self.price(self.jettonAddressB);
       if(sendB > self.bAmount){
-        sendJetton(self.jettonAddressA, msg.from, msg.amount, msg.queryId);
+        sendJetton(self.jettonAddressA, msg.from, msg.amount);
       }
       else {
-        sendJetton(self.jettonAddressB, msg.from, sendB, msg.queryId);
+        sendJetton(self.jettonAddressB, msg.from, sendB);
         self.aAmount = self.aAmount + msg.amount;
         self.bAmount = self.bAmount - sendB;
       }
@@ -111,10 +111,10 @@ contract Task3 with Deployable {
       let sendA : Int = (self.aAmount * self.decimal / self.bAmount) * msg.amount / self.decimal;
       // let sendA : Int = msg.amount * self.decimal / self.price(self.jettonAddressA);
       if(sendA > self.aAmount){
-        sendJetton(self.jettonAddressB, msg.from, msg.amount, msg.queryId);
+        sendJetton(self.jettonAddressB, msg.from, msg.amount);
       }
       else {
-        sendJetton(self.jettonAddressA, msg.from, sendA, msg.queryId);
+        sendJetton(self.jettonAddressA, msg.from, sendA);
         self.bAmount = self.bAmount + msg.amount;
         self.aAmount = self.aAmount - sendA;
       }
