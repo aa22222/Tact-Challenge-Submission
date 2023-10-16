@@ -158,14 +158,14 @@ contract Task5 with Deployable {
   receive(msg: AdminWithdrawalAllNFTs) {
     require(context().value >= (1000000000 + self.nftsHeld * 80000000) , "Insufficent funds");
     require(sender() == self.admin, "Invalid sender");
-    while(self.nftsHeld > 0){
-      let next: Int = self.nftsHeld - 1;
-      let nft: Address = self.nftlist.get(next)!!;
-      self.nftlist.set(next, null);
-      self.nftsHeld = next;
+    // while(self.nftsHeld > 0){
+    //   let next: Int = self.nftsHeld - 1;
+    //   let nft: Address = self.nftlist.get(next)!!;
+    //   self.nftlist.set(next, null);
+    //   self.nftsHeld = next;
 
-      sendNft(nft, self.admin, msg.queryId);
-    }
+    //   sendNft(nft, self.admin, msg.queryId);
+    // }
   }
 
   get fun profit(): Int { 
