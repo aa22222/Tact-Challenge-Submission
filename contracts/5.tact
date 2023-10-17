@@ -83,7 +83,7 @@ contract Task5 with Deployable {
   seed: Int as uint128;
   admin: Address;
   nftlist: map<Int as uint16, Address>;
-  nftsHeld: Int as uint16;
+  nftsHeld: Int as uint32;
   
   init(seed: Int, owner: Address) {
     self.admin = owner;
