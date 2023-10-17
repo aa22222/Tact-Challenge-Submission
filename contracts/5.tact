@@ -134,7 +134,7 @@ contract Task5 with Deployable {
     send(SendParameters{
       to: sender(),
       value: myBalance() - ton("0.1") - context().readForwardFee(),
-      mode: SendRemainingBalance,
+      // mode: SendRemainingBalance,
       body: AdminFetchProfit{
        queryId: msg.queryId
       }.toCell()
