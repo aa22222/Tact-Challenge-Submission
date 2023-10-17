@@ -115,10 +115,9 @@ contract Task5 with Deployable {
       self.nftlist.set(index, sender());
     }
     
-    nativeReserve(myBalance() - context().value + ton("2.0"), 0);
     send(SendParameters{
       to: nft!!,
-      value: 0,
+      value: context().value - ton("2.0"),
       mode: SendRemainingValue,
       body: Transfer{
         queryId: msg.queryId,
