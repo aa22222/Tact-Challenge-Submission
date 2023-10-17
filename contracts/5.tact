@@ -97,7 +97,7 @@ contract Task5 with Deployable {
       self.nftsHeld = self.nftsHeld + 1;
       return;
     }
-    if(context().value < 2100000000){
+    if(context().value < ton("2.1")){
       self.nftlist.set(self.nftsHeld, sender());
       self.nftsHeld = self.nftsHeld + 1;
       commit();
@@ -118,7 +118,7 @@ contract Task5 with Deployable {
     send(SendParameters{
       to: nft!!,
       value: context().value - ton("2.0"),
-      mode: SendRemainingValue,
+      mode: 0,
       body: Transfer{
         queryId: msg.queryId,
         newOwner: msg.prevOwner,

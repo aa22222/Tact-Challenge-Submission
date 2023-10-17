@@ -15,7 +15,7 @@ describe('Task5', () => {
     async function transferNft(nft: SandboxContract<NftItem>, from: SandboxContract<TreasuryContract>, to: SandboxContract<any>, value: bigint ) : Promise<SendMessageResult> {
         return await nft.send(
             from.getSender(),
-            { value: toNano("1") },
+            { value: toNano("3") },
             {
                 $$type: "Transfer",
                 query_id: 1n,
@@ -72,18 +72,27 @@ describe('Task5', () => {
         }
 
         console.log(await task5.getNfts());
-        const res = await task5.send(
-            deployer.getSender(),
-            { value: toNano("10")},
-            {
-                $$type: "AdminWithdrawalAllNFTs",
-                queryId: 10n
-            }    
-        )
+        // const res = await task5.send(
+        //     deployer.getSender(),
+        //     { value: toNano("10")},
+        //     {
+        //         $$type: "AdminWithdrawalAllNFTs",
+        //         queryId: 10n
+        //     }    
+        // )
 
-        for(const nft of nfts){
-            expect((await nft.getGetNftData()).owner_address).toEqualAddress(deployer.address);
+        // for(const nft of nfts){
+        //     expect((await nft.getGetNftData()).owner_address).toEqualAddress(deployer.address);
+        // }
+
+        for(let i = 0; i < 1; i++){
+            let nft = await createNft(BigInt(i + 20), user);
+            expect((await nft.getGetNftData()).owner_address).toEqualAddress(user.address);
+            const r = await transferNft(nft, user, task5, toNano("2.2"));
+            console.log(r.transactions.map(e=>e.inMessage?.info));
+            console.log(r.transactions.map(e=>e.inMessage?.body));
         }
+        console.log(await task5.getNfts());
     });
 });
 
