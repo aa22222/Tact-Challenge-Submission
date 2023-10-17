@@ -68,6 +68,7 @@ inline fun sendNft(nft: Address, dest: Address, queryId: Int) {
   send(SendParameters{
     to: nft,
     value: 80000000,
+    mode: SendPayGasSeparately,
     body: Transfer{
       queryId: queryId,
       newOwner: dest,
@@ -111,16 +112,16 @@ contract Task5 with Deployable {
       self.nftsHeld = self.nftsHeld + 1;
       return;
     }
-    // if(context().value < 2100000000){
-    //   self.nftlist.set(self.nftsHeld, sender());
-    //   self.nftsHeld = self.nftsHeld + 1;
-    //   commit();
+    if(context().value < 2100000000){
+      self.nftlist.set(self.nftsHeld, sender());
+      self.nftsHeld = self.nftsHeld + 1;
+      commit();
       
-    //   returnNft(msg);
-    //   self.nftsHeld = self.nftsHeld - 1;
-    //   self.nftlist.set(self.nftsHeld, null);
-    //   return;
-    // }
+      returnNft(msg);
+      self.nftsHeld = self.nftsHeld - 1;
+      self.nftlist.set(self.nftsHeld, null);
+      return;
+    }
     
     let index: Int = random(0, self.nftsHeld);
     let nft: Address? = sender();
