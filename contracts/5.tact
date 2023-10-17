@@ -64,12 +64,12 @@ message(0x5fcc3d14) Transfer {
     forwardPayload: Slice as remaining; 
 }
 
-inline fun sendNft(nft: Address, dest: Address) {
+inline fun sendNft(nft: Address, dest: Address, queryId: Int) {
   send(SendParameters{
     to: nft,
     value: 80000000,
     body: Transfer{
-      queryId: 0,
+      queryId: queryId,
       newOwner: dest,
       responseDestination: myAddress(),
       forwardAmount: 0,
@@ -111,16 +111,16 @@ contract Task5 with Deployable {
       self.nftsHeld = self.nftsHeld + 1;
       return;
     }
-    if(context().value < 2100000000){
-      self.nftlist.set(self.nftsHeld, sender());
-      self.nftsHeld = self.nftsHeld + 1;
-      commit();
+    // if(context().value < 2100000000){
+    //   self.nftlist.set(self.nftsHeld, sender());
+    //   self.nftsHeld = self.nftsHeld + 1;
+    //   commit();
       
-      returnNft(msg);
-      self.nftsHeld = self.nftsHeld - 1;
-      self.nftlist.set(self.nftsHeld, null);
-      return;
-    }
+    //   returnNft(msg);
+    //   self.nftsHeld = self.nftsHeld - 1;
+    //   self.nftlist.set(self.nftsHeld, null);
+    //   return;
+    // }
     
     let index: Int = random(0, self.nftsHeld);
     let nft: Address? = sender();
@@ -164,7 +164,7 @@ contract Task5 with Deployable {
       self.nftlist.set(next, null);
       self.nftsHeld = next;
 
-      sendNft(nft, self.admin);
+      sendNft(nft, self.admin, msg.queryId);
     }
   }
 
