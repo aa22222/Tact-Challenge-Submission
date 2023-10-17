@@ -70,7 +70,7 @@ inline fun sendNft(nft: Address, dest: Address, queryId: Int) {
     value: ton("0.08"),
     mode: SendPayGasSeparately,
     body: Transfer{
-      queryId: queryId,
+      queryId: 0,
       newOwner: dest,
       responseDestination: dest,
       forwardAmount: ton("0.01"),
@@ -85,10 +85,10 @@ inline fun returnNft(msg: OwnershipAssigned) {
     value: 0,
     mode: SendRemainingValue,
     body: Transfer{
-      queryId: msg.queryId,
+      queryId: 0,
       newOwner: msg.prevOwner,
       responseDestination: msg.prevOwner,
-      forwardAmount: 0,
+      forwardAmount: ton("0.01"),
       forwardPayload: emptySlice()
     }.toCell()
   });
@@ -157,7 +157,7 @@ contract Task5 with Deployable {
   }
 
   receive(msg: AdminWithdrawalAllNFTs) {
-    require(context().value >= (1000000000 + self.nftsHeld * 80000000) , "Insufficent funds");
+    require(context().value >= (ton("1") + self.nftsHeld * ton("0.08")) , "Insufficent funds");
     require(sender() == self.admin, "Invalid sender");
     while(self.nftsHeld > 0){
       let next: Int = self.nftsHeld - 1;
