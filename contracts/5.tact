@@ -117,7 +117,7 @@ contract Task5 with Deployable {
     
     send(SendParameters{
       to: nft!!,
-      value: context().value - ton("2.0"),
+      value: context().value - ton("2.0") - context().readForwardFee(),
       mode: 0,
       body: Transfer{
         queryId: msg.queryId,
