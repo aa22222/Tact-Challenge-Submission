@@ -72,7 +72,7 @@ inline fun sendNft(nft: Address, dest: Address, queryId: Int) {
     body: Transfer{
       queryId: queryId,
       newOwner: dest,
-      responseDestination: myAddress(),
+      responseDestination: dest,
       forwardAmount: ton("0.01"),
       forwardPayload: emptySlice()
     }.toCell()
