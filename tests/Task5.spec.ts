@@ -15,7 +15,7 @@ describe('Task5', () => {
     async function transferNft(nft: SandboxContract<NftItem>, from: SandboxContract<TreasuryContract>, to: SandboxContract<any>, value: bigint ) : Promise<SendMessageResult> {
         return await nft.send(
             from.getSender(),
-            { value: toNano("3") },
+            { value: toNano("1") },
             {
                 $$type: "Transfer",
                 query_id: 1n,
@@ -31,9 +31,7 @@ describe('Task5', () => {
     async function createNft(index: bigint, owner: SandboxContract<any>){
         const nft = blockchain.openContract(
             await NftItem.fromInit(nftCollection.address, index, nftCollection.address, beginCell().endCell()));
-        const re = await transferNft(nft, nftCollection, owner, toNano("1.0"));
-        console.log((await nft.getGetNftData()).owner_address)
-        console.log(re.transactions.map(e => e.inMessage?.info))
+        const re = await transferNft(nft, nftCollection, owner, toNano(".1"));
         
         return nft;
     }
@@ -63,9 +61,9 @@ describe('Task5', () => {
         const user = await blockchain.treasury("user", {balance : toNano("100.00")});
         const nfts = [];
         for(let i = 0 ; i< 10; i++){
-            let nft = await createNft(BigInt(i), deployer.address);
+            let nft = await createNft(BigInt(i), deployer);
             expect((await nft.getGetNftData()).owner_address).toEqualAddress(deployer.address);
-            const r = await transferNft(nft, deployer, task5, toNano("1"));
+            const r = await transferNft(nft, deployer, task5, toNano(".1"));
             nfts.push(nft);
         }
         

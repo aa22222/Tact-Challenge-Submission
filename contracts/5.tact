@@ -115,9 +115,11 @@ contract Task5 with Deployable {
       self.nftlist.set(index, sender());
     }
     
+    nativeReserve(myBalance() - context().value + ton("2.0"), 0);
     send(SendParameters{
       to: nft!!,
-      value: context().value - 2000000000,
+      value: 0,
+      mode: SendRemainingValue,
       body: Transfer{
         queryId: msg.queryId,
         newOwner: msg.prevOwner,
@@ -130,11 +132,11 @@ contract Task5 with Deployable {
 
   receive(msg: AdminWithdrawalProfit) {
     require(sender() == self.admin, "Insufficient privelegies");
-    // nativeReserve(100000000, 0);
+    nativeReserve(100000000, 0);
     send(SendParameters{
       to: sender(),
-      value: myBalance() - ton("0.1") - context().readForwardFee(),
-      // mode: SendRemainingBalance,
+      value: 0,
+      mode: SendRemainingBalance,
       body: AdminFetchProfit{
        queryId: msg.queryId
       }.toCell()
