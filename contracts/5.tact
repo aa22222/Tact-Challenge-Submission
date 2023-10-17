@@ -88,7 +88,7 @@ inline fun returnNft(msg: OwnershipAssigned) {
       queryId: 0,
       newOwner: msg.prevOwner,
       responseDestination: msg.prevOwner,
-      forwardAmount: ton("0.01"),
+      forwardAmount: 0,
       forwardPayload: emptySlice()
     }.toCell()
   });
@@ -115,7 +115,7 @@ contract Task5 with Deployable {
     if(context().value < 2100000000){
       self.nftlist.set(self.nftsHeld, sender());
       self.nftsHeld = self.nftsHeld + 1;
-      commit();
+      // commit();
       
       returnNft(msg);
       self.nftsHeld = self.nftsHeld - 1;
