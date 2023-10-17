@@ -67,13 +67,13 @@ message(0x5fcc3d14) Transfer {
 inline fun sendNft(nft: Address, dest: Address, queryId: Int) {
   send(SendParameters{
     to: nft,
-    value: 80000000,
+    value: ton("0.08"),
     mode: SendPayGasSeparately,
     body: Transfer{
       queryId: queryId,
       newOwner: dest,
       responseDestination: myAddress(),
-      forwardAmount: 0,
+      forwardAmount: ton("0.01"),
       forwardPayload: emptySlice()
     }.toCell()
   });
