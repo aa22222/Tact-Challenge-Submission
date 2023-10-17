@@ -48,7 +48,7 @@ message NftWithdrawal {
 
 contract Task4 with Deployable {
   seed: Int as uint128;
-  unlockTime: Int as uint64;
+  unlockTime: Int;
   nft: Address?;
   owner: Address?;
   
@@ -102,7 +102,7 @@ contract Task4 with Deployable {
         newOwner: self.owner!!,
         responseDestination: self.owner!!,
         forwardAmount: 0,
-        forwardPayload: emptyCell().asSlice()
+        forwardPayload: emptySlice()
       }.toCell()
     });
     
