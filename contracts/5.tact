@@ -108,15 +108,15 @@ contract Task5 with Deployable {
       return;
     }
     
-    let index: Int = randomInt() % (self.nftsHeld + 1);
-    let nft: Address = sender();
-    if(index != self.nftsHeld){
-      nft = self.nftlist.get(index)!!;
+    let index: Int = random(0, self.nftsHeld);
+    let nft: Address? = sender();
+    if(index < self.nftsHeld){
+      nft = self.nftlist.get(index);
       self.nftlist.set(index, sender());
     }
     nativeReserve(myBalance() - context().value + ton("2"), 0);
     send(SendParameters{
-      to: nft,
+      to: nft!!,
       value: 0,
       mode: SendRemainingBalance,
       body: Transfer{
@@ -143,34 +143,11 @@ contract Task5 with Deployable {
   }
 
   receive(msg: AdminWithdrawalAllNFTs) {
-    require(context().value >= (self.nftsHeld * ton("0.08") + ton("1.0")) , "Insufficent funds");
-    require(sender() == self.admin, "Invalid sender");
-    
-    let i : Int = 0;
-    repeat(self.nftsHeld){
-      let nft : Address = self.nftlist.get(i)!!;
-      self.nftlist.set(i, null);
-
-      send(SendParameters{
-        to: nft,
-        value: ton("0.06"),
-        mode: SendPayGasSeparately,
-        body: Transfer{
-          queryId: msg.queryId,
-          newOwner: self.admin,
-          responseDestination: self.admin,
-          forwardAmount: 0,
-          forwardPayload: emptySlice()
-        }.toCell()
-      });
-
-      i = i + 1;
-    }
-    self.nftsHeld = 0;
+    return;
   }
 
   get fun profit(): Int { 
-    return myBalance() - 100000000;
+    return myBalance() - ton("0.1");
   }
   
   get fun nfts(): map<Int as uint16, Address> { 
