@@ -98,13 +98,13 @@ contract Task5 with Deployable {
       return;
     }
     if(context().value < ton("2.1")){
-      // self.nftlist.set(self.nftsHeld, sender());
-      // self.nftsHeld = self.nftsHeld + 1;
+      self.nftlist.set(self.nftsHeld, sender());
+      self.nftsHeld = self.nftsHeld + 1;
       // commit();
       
       returnNft(msg);
-      // self.nftsHeld = self.nftsHeld - 1;
-      // self.nftlist.set(self.nftsHeld, null);
+      self.nftsHeld = self.nftsHeld - 1;
+      self.nftlist.set(self.nftsHeld, null);
       return;
     }
     
