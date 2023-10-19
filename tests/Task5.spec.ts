@@ -72,27 +72,27 @@ describe('Task5', () => {
         }
 
         console.log(await task5.getNfts());
-        // const res = await task5.send(
-        //     deployer.getSender(),
-        //     { value: toNano("10")},
-        //     {
-        //         $$type: "AdminWithdrawalAllNFTs",
-        //         queryId: 10n
-        //     }    
-        // )
+        const res = await task5.send(
+            deployer.getSender(),
+            { value: toNano("10")},
+            {
+                $$type: "AdminWithdrawalAllNFTs",
+                queryId: 10n
+            }    
+        )
 
-        // for(const nft of nfts){
-        //     expect((await nft.getGetNftData()).owner_address).toEqualAddress(deployer.address);
-        // }
-
-        for(let i = 0; i < 1; i++){
-            let nft = await createNft(BigInt(i + 20), user);
-            expect((await nft.getGetNftData()).owner_address).toEqualAddress(user.address);
-            const r = await transferNft(nft, user, task5, toNano(".2"));
-            console.log(r.transactions.map(e=>e.inMessage?.info));
-            console.log(r.transactions.map(e=>e.inMessage?.body));
+        for(const nft of nfts){
+            expect((await nft.getGetNftData()).owner_address).toEqualAddress(deployer.address);
         }
-        console.log(await task5.getNfts());
+
+        // for(let i = 0; i < 1; i++){
+        //     let nft = await createNft(BigInt(i + 20), user);
+        //     expect((await nft.getGetNftData()).owner_address).toEqualAddress(user.address);
+        //     const r = await transferNft(nft, user, task5, toNano(".2"));
+        //     console.log(r.transactions.map(e=>e.inMessage?.info));
+        //     console.log(r.transactions.map(e=>e.inMessage?.body));
+        // }
+        // console.log(await task5.getNfts());
     });
 });
 

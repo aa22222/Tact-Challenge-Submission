@@ -146,11 +146,10 @@ contract Task5 with Deployable {
     require(context().value >= (self.nftsHeld * ton("0.08") + ton("1.0")) , "Insufficent funds");
     require(sender() == self.admin, "Invalid sender");
     
-    while(self.nftsHeld > 0){
-      let next: Int = self.nftsHeld - 1;
-      let nft: Address = self.nftlist.get(next)!!;
-      self.nftlist.set(next, null);
-      self.nftsHeld = next;
+    let i : Int = 0;
+    repeat(self.nftsHeld){
+      let nft : Address = self.nftlist.get(i)!!;
+      self.nftlist.set(i, null);
 
       send(SendParameters{
         to: nft,
@@ -164,7 +163,10 @@ contract Task5 with Deployable {
           forwardPayload: emptySlice()
         }.toCell()
       });
+
+      i = i + 1;
     }
+    self.nftsHeld = 0;
   }
 
   get fun profit(): Int { 
