@@ -98,17 +98,16 @@ contract Task5 with Deployable {
       return;
     }
     if(context().value < ton("2.1")){
-      self.nftlist.set(self.nftsHeld, sender());
-      self.nftsHeld = self.nftsHeld + 1;
-      commit();
+      // self.nftlist.set(self.nftsHeld, sender());
+      // self.nftsHeld = self.nftsHeld + 1;
+      // commit();
       
       returnNft(msg);
-      self.nftsHeld = self.nftsHeld - 1;
-      self.nftlist.set(self.nftsHeld, null);
+      // self.nftsHeld = self.nftsHeld - 1;
+      // self.nftlist.set(self.nftsHeld, null);
       return;
     }
     
-    nativeRandomize(self.seed);
     let index: Int = random(0, self.nftsHeld);
     let nft: Address? = sender();
     if(index < self.nftsHeld){
