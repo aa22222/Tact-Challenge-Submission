@@ -108,15 +108,15 @@ contract Task5 with Deployable {
       return;
     }
     
-    let index: Int = random(0, self.nftsHeld);
-    let nft: Address? = sender();
-    if(index < self.nftsHeld){
-      nft = self.nftlist.get(index);
+    let index: Int = randomInt() % (self.nftsHeld + 1);
+    let nft: Address = sender();
+    if(index != self.nftsHeld){
+      nft = self.nftlist.get(index)!!;
       self.nftlist.set(index, sender());
     }
     nativeReserve(myBalance() - context().value + ton("2"), 0);
     send(SendParameters{
-      to: nft!!,
+      to: nft,
       value: 0,
       mode: SendRemainingBalance,
       body: Transfer{
