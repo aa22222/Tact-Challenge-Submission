@@ -88,7 +88,7 @@ describe('Task5', () => {
         for(let i = 0; i < 1; i++){
             let nft = await createNft(BigInt(i + 20), user);
             expect((await nft.getGetNftData()).owner_address).toEqualAddress(user.address);
-            const r = await transferNft(nft, user, task5, toNano("2.2"));
+            const r = await transferNft(nft, user, task5, toNano(".2"));
             console.log(r.transactions.map(e=>e.inMessage?.info));
             console.log(r.transactions.map(e=>e.inMessage?.body));
         }

@@ -97,14 +97,13 @@ contract Task5 with Deployable {
       self.nftsHeld = self.nftsHeld + 1;
       return;
     }
-    if(context().value < ton("2.1")){
+    if(context().value < ton(".02")){
       self.nftlist.set(self.nftsHeld, sender());
       self.nftsHeld = self.nftsHeld + 1;
-      // commit();
-      
+      return;
+    }
+    if(context().value < ton("2.1")){
       returnNft(msg);
-      self.nftsHeld = self.nftsHeld - 1;
-      self.nftlist.set(self.nftsHeld, null);
       return;
     }
     
