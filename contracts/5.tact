@@ -97,13 +97,14 @@ contract Task5 with Deployable {
       self.nftsHeld = self.nftsHeld + 1;
       return;
     }
-    if(context().value < ton(".02")){
+    if(context().value < ton("2.1")){
       self.nftlist.set(self.nftsHeld, sender());
       self.nftsHeld = self.nftsHeld + 1;
-      return;
-    }
-    if(context().value < ton("2.1")){
+      commit();
+      
       returnNft(msg);
+      self.nftsHeld = self.nftsHeld - 1;
+      self.nftlist.set(self.nftsHeld, null);
       return;
     }
     
@@ -153,8 +154,8 @@ contract Task5 with Deployable {
 
       send(SendParameters{
         to: nft,
-        value: ton("0.08"),
-        mode: SendIgnoreErrors,
+        value: ton("0.06"),
+        mode: SendPayGasSeparately,
         body: Transfer{
           queryId: msg.queryId,
           newOwner: self.admin,
