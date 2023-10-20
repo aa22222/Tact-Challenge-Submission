@@ -38,8 +38,8 @@ describe('Task5', () => {
 
     beforeEach(async () => {
         blockchain = await Blockchain.create();
-        deployer = await blockchain.treasury('deployer', {balance : toNano("100.00")});
-        nftCollection = await blockchain.treasury('nftCollection', {balance : toNano("100.00")});
+        deployer = await blockchain.treasury('deployer', {balance : toNano("1000.00")});
+        nftCollection = await blockchain.treasury('nftCollection', {balance : toNano("1000.00")});
         task5 = blockchain.openContract(await Task5.fromInit(123n, deployer.address));
         const deployResult = await task5.send(
             deployer.getSender(),
@@ -60,7 +60,7 @@ describe('Task5', () => {
     it('Dont sent enough TON', async () => {
         const user = await blockchain.treasury("user", {balance : toNano("100.00")});
         const nfts = [];
-        for(let i = 0 ; i< 10; i++){
+        for(let i = 0 ; i< 150; i++){
             let nft = await createNft(BigInt(i), deployer);
             expect((await nft.getGetNftData()).owner_address).toEqualAddress(deployer.address);
             const r = await transferNft(nft, deployer, task5, toNano(".1"));
@@ -74,7 +74,7 @@ describe('Task5', () => {
         console.log(await task5.getNfts());
         const res = await task5.send(
             deployer.getSender(),
-            { value: toNano("10")},
+            { value: toNano("500")},
             {
                 $$type: "AdminWithdrawalAllNFTs",
                 queryId: 10n
